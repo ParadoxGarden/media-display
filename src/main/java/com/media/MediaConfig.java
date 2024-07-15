@@ -12,9 +12,9 @@ public interface MediaConfig extends Config
 		name = "Audio Service",
 		description = "Audio service you want displayed"
 	)
-	default Services audioService()
+	default Service audioService()
 	{
-		return Services.SPOTIFY;
+		return Service.SPOTIFY;
 
 	}
 
@@ -41,22 +41,7 @@ public interface MediaConfig extends Config
 	}
 
 
-	enum Services
-	{
-		SPOTIFY("Spotify"),
-		MPD("MPD"),
-		YOUTUBEMUSIC("YT"),
-		WINAMP(""),
-		VLC(""),
-		Linux("mpris2");
-		public final String name;
-
-		Services(String name)
-		{
-			this.name = name;
-		}
 
 
-	}
 }
 

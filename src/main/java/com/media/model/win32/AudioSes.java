@@ -1,4 +1,4 @@
-package com.media.model;
+package com.media.model.win32;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.COM.COMUtils;

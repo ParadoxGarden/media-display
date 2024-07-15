@@ -11,6 +11,7 @@ import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
+import net.runelite.client.ui.overlay.components.TitleComponent;
 
 public class MediaOverlay extends OverlayPanel
 {
@@ -36,21 +37,27 @@ public class MediaOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		toDisplay = getMediaTitle(plugin.getMediaString());
+		toDisplay = plugin.getMediaString();
 		int longest = 0;
-		for (String s : toDisplay.split("\n"))
+		if(toDisplay.contains("\n"))
 		{
-			panelComponent.getChildren().add(LineComponent.builder().left(s).leftColor(Color.WHITE).build());
-			int strLen = s.length();
-			if (strLen > longest)
+			for (String s : toDisplay.split("\n"))
 			{
-				longest = strLen;
+				panelComponent.getChildren().add(LineComponent.builder().left(s).leftColor(Color.WHITE).build());
+				int strLen = graphics.getFontMetrics().stringWidth(s);
+				if (strLen > longest)
+				{
+					longest = strLen;
+				}
 			}
+			panelComponent.setPreferredSize(new Dimension(longest + 10, 0));
+		}else{
+			panelComponent.getChildren().add(TitleComponent.builder().text(toDisplay).color(Color.WHITE).build());
+			panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth(toDisplay) + 10, 0));
 		}
-		panelComponent.setPreferredSize(new Dimension(((graphics.getFontMetrics().stringWidth(toDisplay) + 10) / 3) * 2, 0));
 		return super.render(graphics);
 	}
-
+/*
 	private String getMediaTitle(String curMedia)
 	{
 		String mediaTitle = "";
@@ -95,9 +102,10 @@ public class MediaOverlay extends OverlayPanel
 		}
 		if (config.artistSplit())
 		{
-			mediaTitle = mediaTitle.replace("-", "-\n");
+			mediaTitle = mediaTitle.replaceFirst("-", "-\n");
 		}
 		lastMediaTitle = mediaTitle;
 		return mediaTitle;
 	}
+*/
 }

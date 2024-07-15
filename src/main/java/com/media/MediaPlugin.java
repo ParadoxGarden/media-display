@@ -1,23 +1,15 @@
 package com.media;
 
 import com.google.inject.Provides;
-import com.media.model.AudioSes;
-import com.media.model.AudioSes.AudioSessionControl2;
-import com.media.model.AudioSes.AudioSessionEnumerator;
-import com.media.model.AudioSes.AudioSessionManager2;
-import com.media.model.MMDevAPI.MMDevice;
-import com.media.model.MMDevAPI.MMDeviceEnumerator;
-import com.sun.jna.platform.DesktopWindow;
-import com.sun.jna.platform.WindowUtils;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.ptr.IntByReference;
-import java.util.Objects;
+import com.media.model.providers.AudioProvider;
+import com.media.model.providers.Game;
+import com.media.model.providers.Spotify;
 import java.util.concurrent.Semaphore;
 import javax.inject.Inject;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -36,9 +28,8 @@ public class MediaPlugin extends Plugin
 	@Getter
 	private static MediaPlugin instance;
 	private final Semaphore semaphore = new Semaphore(1);
-
-	public AudioSessionControl2 activeAudioSession;
-	public DesktopWindow activeAudioWindow;
+	@Setter
+	public AudioProvider audio;
 	@Inject
 	private Client client;
 	@Inject
@@ -51,7 +42,6 @@ public class MediaPlugin extends Plugin
 	private MediaOverlay overlay;
 	@Getter
 	private String mediaString = "";
-	private MMDevice defaultDevice;
 
 	@Provides
 	MediaConfig getConfig(ConfigManager configManager)
@@ -59,59 +49,17 @@ public class MediaPlugin extends Plugin
 		return configManager.getConfig(MediaConfig.class);
 	}
 
-	private MMDevice getDefaultDevice()
-	{
-		MMDeviceEnumerator audioDevices = MMDeviceEnumerator.create();
-		assert audioDevices != null;
-		return audioDevices.getDefaultDevice();
-	}
-
-	public void findActiveAudioSes()
-	{
-		AudioSessionManager2 sessionManager = defaultDevice.createManager();
-		AudioSessionEnumerator sessionEnumerator = sessionManager.getSessionEnumerator();
-		int count = sessionEnumerator.getCount();
-		for (int i = 0; i < count; i++)
-		{
-			AudioSessionControl2 ses = sessionEnumerator.getSession(i);
-			if (ses.getState() == AudioSes.AudioSessionStateActive)
-			{
-				if (Objects.equals(ses.getName(), config.audioService().name))
-				{
-					activeAudioSession = ses;
-					activeAudioWindow = getWindowByPID(ses.getProcessID());
-					return;
-				}
-
-			}
-		}
-
-	}
-
-	public DesktopWindow getWindowByPID(int pid)
-	{
-		for (DesktopWindow window : WindowUtils.getAllWindows(false))
-		{
-			IntByReference winPID = new IntByReference();
-			User32.INSTANCE.GetWindowThreadProcessId(window.getHWND(), winPID);
-			if (winPID.getValue() == pid)
-			{
-				return window;
-			}
-
-		}
-		return null;
-	}
-
-
 	private void updateMedia()
 	{
-
-		findActiveAudioSes();
-		if (activeAudioWindow != null)
+		audio.findAudio();
+		if (!audio.isStopped())
 		{
-			mediaString = activeAudioWindow.getTitle();
-			overlayManager.add(overlay);
+			mediaString = audio.getMediaFromProvider();
+			if (overlayManager.getWidgetItems().contains(overlay)){
+				return;
+			}else {
+				overlayManager.add(overlay);
+			}
 		}
 		else
 		{
@@ -123,19 +71,19 @@ public class MediaPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-
 		this.overlay = new MediaOverlay(this, config);
-
-		defaultDevice = getDefaultDevice();
-		clientThread.invoke(() -> {
-
-			if (client.getGameState() == GameState.LOGGED_IN)
-			{
-				updateMedia();
-			}
-		});
+		audio = getProvider(config.audioService());
 	}
 
+	public AudioProvider getProvider(Service service) {
+		switch (service){
+			default:
+			case SPOTIFY:
+				return new Spotify(config, client);
+			case GAME:
+				return new Game(config, client);
+		}
+	}
 	@Override
 	protected void shutDown()
 	{
@@ -143,9 +91,13 @@ public class MediaPlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged config)
+	public void onConfigChanged(ConfigChanged configChanged)
 	{
-		overlay.setLastMedia("");
+		Service curService = this.config.audioService();
+		if (audio.getService() != curService){
+			audio = getProvider(curService);
+		}
+
 
 	}
 
