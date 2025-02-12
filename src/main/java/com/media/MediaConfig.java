@@ -40,8 +40,13 @@ public interface MediaConfig extends Config
 
 	}
 
-
-
-
+	@ConfigItem(
+		keyName = "lineLength",
+		name = "Line Length Limit",
+		description = "Cut off the line if song name is too long (default: 50)"
+	)
+	default int lineLen()
+	{
+		return 50;
+	}
 }
-

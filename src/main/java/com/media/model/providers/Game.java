@@ -5,7 +5,7 @@ import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 
-public class Game extends AudioProvider
+public class Game extends MediaProvider
 {
 	private static final int CURRENTLY_PLAYING_WIDGET_ID = 9;
 	private Widget curTrackWidget;

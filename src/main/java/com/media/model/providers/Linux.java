@@ -3,9 +3,9 @@ package com.media.model.providers;
 import com.media.MediaConfig;
 import net.runelite.api.Client;
 
-public abstract class LinuxProvider extends AudioProvider
+public abstract class Linux extends MediaProvider
 {
-	LinuxProvider(MediaConfig config, Client client)
+	Linux(MediaConfig config, Client client)
 	{
 		super(config, client);
 	}

@@ -11,6 +11,7 @@ import com.sun.jna.win32.StdCallLibrary;
 
 public interface AudioSes extends StdCallLibrary
 {
+
 	Guid.REFIID AUDIO_SESSION_MANAGER_REF = new Guid.REFIID(new Guid.IID("77AA99A0-1BD6-484F-8BC7-2C654C9A9B6F"));
 	Guid.REFIID AUDIO_SESSION_CONTROL2_REF = new Guid.REFIID(new Guid.IID("bfb7ff88-7239-4fc9-8fa2-07c950be9c6d"));
 	int AudioSessionStateInactive = 0;
@@ -19,6 +20,8 @@ public interface AudioSes extends StdCallLibrary
 
 	class AudioSessionControl extends Unknown
 	{
+		// https://learn.microsoft.com/en-us/windows/win32/api/audiopolicy/nn-audiopolicy-iaudiosessioncontrol
+
 		public AudioSessionControl(Pointer p)
 		{
 			super(p);

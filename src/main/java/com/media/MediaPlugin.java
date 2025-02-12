@@ -1,8 +1,9 @@
 package com.media;
 
 import com.google.inject.Provides;
-import com.media.model.providers.AudioProvider;
+import com.media.model.providers.MediaProvider;
 import com.media.model.providers.Game;
+import com.media.model.providers.Mpv;
 import com.media.model.providers.Spotify;
 import java.util.concurrent.Semaphore;
 import javax.inject.Inject;
@@ -29,7 +30,7 @@ public class MediaPlugin extends Plugin
 	private static MediaPlugin instance;
 	private final Semaphore semaphore = new Semaphore(1);
 	@Setter
-	public AudioProvider audio;
+	public MediaProvider audio;
 	@Inject
 	private Client client;
 	@Inject
@@ -75,21 +76,34 @@ public class MediaPlugin extends Plugin
 		audio = getProvider(config.audioService());
 	}
 
-	public AudioProvider getProvider(Service service) {
+	/**
+	 *
+	 * @param service one of the supported services
+	 * @return class that will do the work of finding media strings
+	 */
+	public MediaProvider getProvider(Service service) {
 		switch (service){
-			default:
 			case SPOTIFY:
 				return new Spotify(config, client);
+			case MPV:
+				return new Mpv(config, client);
 			case GAME:
+			default:
 				return new Game(config, client);
 		}
 	}
+
 	@Override
 	protected void shutDown()
 	{
 		overlayManager.remove(overlay);
 	}
 
+	/**
+	 * updates the instance stored config
+	 * ensures that the media info provider is kept up to date
+	 * @param configChanged config sent from the game client
+	 */
 	@Subscribe
 	public void onConfigChanged(ConfigChanged configChanged)
 	{
@@ -101,10 +115,12 @@ public class MediaPlugin extends Plugin
 
 	}
 
+	/**
+	 * once a game tick see if we can check media for updates
+	 */
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-
 		if (!semaphore.tryAcquire())
 		{
 			Thread t = new Thread(this::updateMedia);

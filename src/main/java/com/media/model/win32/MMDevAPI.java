@@ -12,9 +12,11 @@ import com.sun.jna.win32.StdCallLibrary;
 
 public interface MMDevAPI extends StdCallLibrary
 {
+	// https://learn.microsoft.com/en-us/windows/win32/coreaudio/mmdevice-api
 
 	class MMDevice extends Unknown
 	{
+		// https://learn.microsoft.com/en-us/windows/win32/api/mmdeviceapi/nn-mmdeviceapi-immdevice
 		public MMDevice()
 		{
 			super();
@@ -50,6 +52,7 @@ public interface MMDevAPI extends StdCallLibrary
 
 	class MMDeviceEnumerator extends Unknown
 	{
+		// https://learn.microsoft.com/en-us/windows/win32/api/mmdeviceapi/nn-mmdeviceapi-immdeviceenumerator
 		public MMDeviceEnumerator()
 		{
 		}

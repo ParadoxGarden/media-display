@@ -7,9 +7,10 @@ Currently only works on windows
 ### Currently Supported:
 
 - Spotify (Desktop app)
+- MPV
+- Game Music
 
 ### Future plans:
 
 - Investigate browser support on windows
-- Maybe refactor out each audio service
-- Other players are available
+- Other media players are available

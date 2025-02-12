@@ -5,13 +5,13 @@ import com.media.Service;
 import lombok.Getter;
 import net.runelite.api.Client;
 
-public abstract class AudioProvider
+public abstract class MediaProvider
 {
 	MediaConfig config;
 	@Getter
 	Service service;
 	Client client;
-	AudioProvider(MediaConfig config, Client client){
+	MediaProvider(MediaConfig config, Client client){
 		this.config = config;
 		this.client = client;
 	}

@@ -39,19 +39,30 @@ public class MediaOverlay extends OverlayPanel
 	{
 		toDisplay = plugin.getMediaString();
 		int longest = 0;
+		int lineLen = config.lineLen();
+		if (Objects.equals(toDisplay, "")){
+			return super.render(graphics);
+		}
 		if(toDisplay.contains("\n"))
 		{
-			for (String s : toDisplay.split("\n"))
+			for (String line : toDisplay.split("\n"))
 			{
-				panelComponent.getChildren().add(LineComponent.builder().left(s).leftColor(Color.WHITE).build());
-				int strLen = graphics.getFontMetrics().stringWidth(s);
+				if(line.length() > lineLen)
+					line = line.substring(0,lineLen) + "...";
+				panelComponent.getChildren().add(LineComponent.builder().left(line).leftColor(Color.WHITE).build());
+				int strLen = graphics.getFontMetrics().stringWidth(line);
+				graphics.getFontMetrics().getHeight();
 				if (strLen > longest)
 				{
 					longest = strLen;
 				}
 			}
 			panelComponent.setPreferredSize(new Dimension(longest + 10, 0));
-		}else{
+		}
+		else{
+			if(toDisplay.length() > lineLen)
+				toDisplay = toDisplay.substring(0,lineLen) + "...";
+
 			panelComponent.getChildren().add(TitleComponent.builder().text(toDisplay).color(Color.WHITE).build());
 			panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth(toDisplay) + 10, 0));
 		}
