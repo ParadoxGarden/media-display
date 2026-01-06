@@ -5,6 +5,6 @@ public enum Service
 {
 	SPOTIFY(),
 	MPV(),
-	//MPRIS2(),
+	MPRIS2(),
 	GAME()
 }

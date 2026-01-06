@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import com.media.model.providers.MediaProvider;
 import com.media.model.providers.Game;
 import com.media.model.providers.Mpv;
+import com.media.model.providers.MPRIS2;
 import com.media.model.providers.Spotify;
 import java.util.concurrent.Semaphore;
 import javax.inject.Inject;
@@ -87,6 +88,8 @@ public class MediaPlugin extends Plugin
 				return new Spotify(config, client);
 			case MPV:
 				return new Mpv(config, client);
+			case MPRIS2:
+				return new MPRIS2(config, client);
 			case GAME:
 			default:
 				return new Game(config, client);
